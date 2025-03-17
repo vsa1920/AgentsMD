@@ -115,4 +115,4 @@ While we maintain the spirit of multi-agent collaboration from AgentLaboratory, 
 
 ## Acknowledgments
 
-This project was developed in collaboration with [Shailesh Shridhar](https://github.com/ShaileshSridhar2403) and builds upon work done in the [AgentsMD repository](https://github.com/ShaileshSridhar2403/AgentsMD), which was originally forked from [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory). We express our gratitude to both repositories for their contributions to this project's development.
+This project was developed in collaboration with [Shailesh Sridhar](https://github.com/ShaileshSridhar2403) and builds upon work done in the [AgentsMD repository](https://github.com/ShaileshSridhar2403/AgentsMD), which was originally forked from [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory). We express our gratitude to both repositories for their contributions to this project's development.
