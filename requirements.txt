@@ -1,0 +1,33 @@
+# Core dependencies
+flask==2.0.1
+werkzeug==2.0.1
+python-dotenv==1.0.0
+openai==1.65.2
+pydantic==2.10.2
+pydantic_core==2.27.1
+
+# Speech to Text dependencies
+pyaudio==0.2.14
+wave==0.0.2
+assemblyai==0.37.0
+
+# Data processing and utilities
+numpy==2.0.2
+pandas==2.2.3
+python-dateutil==2.9.0.post0
+pytz==2024.2
+
+# HTTP and API
+requests==2.32.3
+httpx==0.27.2
+urllib3==2.2.3
+
+# Type hints and metadata
+typing_extensions==4.12.2
+importlib_metadata==8.5.0
+importlib_resources==6.4.5
+
+# Optional dependencies for development
+black==24.8.0
+flake8==7.0.0
+pytest==7.4.4

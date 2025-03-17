@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Triage System Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --info-color: #4361ee;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .card {
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: none;
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-control {
+            border-radius: var(--border-radius);
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: white;
+        }
+        
+        .header-banner {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+        
+        .header-banner h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header-banner p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .logo {
+            max-height: 100px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+        }
+        
+        .form-container {
+            margin-bottom: 30px;
+        }
+        
+        .results-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 30px 0;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .content-display {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            max-height: 500px;
+            overflow-y: auto;
+            line-height: 1.6;
+            color: #24292e;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .typing-animation {
+            display: inline-block;
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end) forwards;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: var(--primary-color);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .modal-dialog {
+            max-width: 90%;
+        }
+        
+        .modal-content {
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: none;
+        }
+        
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+        }
+        
+        .modal-body {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 15px 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .quick-ref-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .quick-ref-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .esi-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .esi-1 { background-color: #e63946; color: white; }
+        .esi-2 { background-color: #ff9f1c; color: white; }
+        .esi-3 { background-color: #ffca3a; color: black; }
+        .esi-4 { background-color: #8ac926; color: white; }
+        .esi-5 { background-color: #1982c4; color: white; }
+        
+        /* Update the markdown-body styles for better readability */
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 100%;
+            margin: 0 auto;
+            color: #24292e;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .markdown-body h1,
+        .markdown-body h2 {
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
+            color: #24292e;
+        }
+        
+        .markdown-body h3,
+        .markdown-body h4,
+        .markdown-body h5,
+        .markdown-body h6 {
+            color: #24292e;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .markdown-body p {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        
+        .markdown-body pre {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            padding: 16px;
+            overflow: auto;
+        }
+        
+        .markdown-body code {
+            background-color: rgba(27, 31, 35, 0.05);
+            border-radius: 3px;
+            padding: 0.2em 0.4em;
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            color: #24292e;
+        }
+        
+        .markdown-body table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        
+        .markdown-body table th,
+        .markdown-body table td {
+            border: 1px solid #dfe2e5;
+            padding: 6px 13px;
+        }
+        
+        .markdown-body table tr {
+            background-color: #fff;
+            border-top: 1px solid #c6cbd1;
+        }
+        
+        .markdown-body table tr:nth-child(2n) {
+            background-color: #f6f8fa;
+        }
+        
+        .markdown-body ul,
+        .markdown-body ol {
+            padding-left: 2em;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        
+        .markdown-body blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: 0.25em solid #dfe2e5;
+            margin: 0 0 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-banner">
+            <div class="text-center">
+                <img src="/static/images/AgentsMDLogo_2.jpeg" alt="AgentsMD Logo" class="logo">
+            </div>
+            <h1>AI Emergency Triage System</h1>
+            <p>Analyze patient conversations to determine Emergency Severity Index (ESI) levels</p>
+            
+            <div class="d-flex justify-content-center mt-3">
+                <button type="button" id="view-history" class="btn btn-light me-2">
+                    <i class="fas fa-history me-2"></i>Patient History
+                </button>
+                <button type="button" id="prioritize-patients" class="btn btn-warning me-2">
+                    <i class="fas fa-sort-amount-down me-2"></i>Prioritize Patients
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Enter patient-nurse conversation, patient notes, or clinical data:</h5>
+                </div>
+                <div class="card-body">
+                    <form id="triage-form">
+                        <div class="form-group mb-3">
+                            <label for="conversation-text" class="form-label">Patient information:</label>
+                            <textarea class="form-control" id="conversation-text" name="conversation_text" rows="10" placeholder="Enter patient conversation, clinical notes, vital signs, or other relevant information here..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="recording-controls">
+                                <button type="button" id="start-recording" class="btn btn-outline-primary">
+                                    <i class="fas fa-microphone me-2"></i>Start Recording
+                                </button>
+                                <button type="button" id="stop-recording" class="btn btn-outline-danger" style="display: none;">
+                                    <i class="fas fa-stop-circle me-2"></i>Stop Recording
+                                </button>
+                                <span id="recording-status" class="ms-2" style="display: none;">
+                                    <i class="fas fa-circle text-danger recording-indicator"></i> Recording...
+                                </span>
+                            </div>
+                            <div id="transcription-status" class="mt-2" style="display: none;">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Transcribing...</span>
+                                </div>
+                                <span class="ms-2">Transcribing audio...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <select class="form-select" id="model-select" name="model">
+                                <option value="o1-mini" selected>OpenAI o1-mini</option>
+                                <option value="gpt-4o-mini">OpenAI GPT-4o-mini</option>
+                                <option value="gpt-4o">OpenAI GPT-4o</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <button type="submit" id="analyze-button" class="btn btn-primary">
+                                <i class="fas fa-stethoscope me-2"></i>Analyze Case
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+            <p class="mt-2">Processing patient case... This may take a few minutes.</p>
+        </div>
+        
+        <div class="progress-container">
+            <h5 id="progress-task">Processing...</h5>
+            <div class="progress">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p id="progress-message" class="text-muted mt-2"></p>
+        </div>
+        
+        <div class="results-container">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clipboard-list me-2"></i>Triage Assessment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-ref-header">
+                        <h3>Emergency Severity Index (ESI)</h3>
+                        <a id="download-quick-ref" href="#" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Quick Reference
+                        </a>
+                    </div>
+                    <div id="esi-level-display"></div>
+                    <div id="quick-ref-content" class="content-display"></div>
+                    
+                    <div class="action-buttons">
+                        <button id="view-detailed-output" class="btn btn-primary">
+                            <i class="fas fa-file-medical-alt me-2"></i>Detailed Output
+                        </button>
+                        <button id="view-discussion" class="btn btn-info">
+                            <i class="fas fa-comments me-2"></i>Agent Discussion
+                        </button>
+                        <button id="view-differential-diagnoses" class="btn btn-success">
+                            <i class="fas fa-stethoscope me-2"></i>Differential Diagnoses
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a id="download-quick-ref" href="#" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Quick Reference
+                        </a>
+                        <a id="download-detailed-output" href="#" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Detailed Output
+                        </a>
+                        <a id="download-discussion" href="#" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Discussion
+                        </a>
+                        <a id="download-differential-diagnoses" href="#" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Differential Diagnoses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Output Modal -->
+    <div class="modal fade" id="detailed-output-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-file-medical-alt me-2"></i>Detailed Triage Output</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detailed-output-content" class="content-display"></div>
+                </div>
+                <div class="modal-footer">
+                    <a id="download-detailed-output" href="#" class="btn btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Discussion Modal -->
+    <div class="modal fade" id="discussion-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-comments me-2"></i>Agent Discussion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="discussion-content" class="content-display"></div>
+                </div>
+                <div class="modal-footer">
+                    <a id="download-discussion" href="#" class="btn btn-outline-info">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Differential Diagnoses Modal -->
+    <div class="modal fade" id="differential-diagnoses-modal" tabindex="-1" aria-labelledby="differential-diagnoses-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="differential-diagnoses-modal-label">Potential Differential Diagnoses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="differential-diagnoses-content" class="content-display"></div>
+                </div>
+                <div class="modal-footer">
+                    <a id="download-differential-diagnoses-modal" href="/download/differential_diagnoses" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update the history modal to include delete buttons -->
+    <div class="modal fade" id="history-modal" tabindex="-1" aria-labelledby="history-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="history-modal-label">Patient Conversation History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>ESI Level</th>
+                                    <th>Summary</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- Conversations will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-history" class="alert alert-info" style="display: none;">
+                        No conversation history found.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete-all-records">
+                        <i class="fas fa-trash-alt me-2"></i>Delete All Records
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add a new modal for patient prioritization -->
+    <div class="modal fade" id="prioritization-modal" tabindex="-1" aria-labelledby="prioritization-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="prioritization-modal-label">Patient Prioritization</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Patients are prioritized based on ESI levels, with level 1 being the highest priority.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Patient</th>
+                                    <th>ESI Level</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="priority-table-body">
+                                <!-- Prioritized patients will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-patients" class="alert alert-info" style="display: none;">
+                        No patients to prioritize.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const triageForm = document.getElementById('triage-form');
+            const loadingIndicator = document.querySelector('.loading');
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressTask = document.getElementById('progress-task');
+            const progressMessage = document.getElementById('progress-message');
+            const resultsContainer = document.querySelector('.results-container');
+            const quickRefContent = document.getElementById('quick-ref-content');
+            const esiLevelDisplay = document.getElementById('esi-level-display');
+            const viewDetailedOutputBtn = document.getElementById('view-detailed-output');
+            const viewDiscussionBtn = document.getElementById('view-discussion');
+            const downloadQuickRef = document.getElementById('download-quick-ref');
+            const downloadDetailedOutput = document.getElementById('download-detailed-output');
+            const downloadDiscussion = document.getElementById('download-discussion');
+            const viewDifferentialDiagnosesBtn = document.getElementById('view-differential-diagnoses');
+            const differentialDiagnosesContent = document.getElementById('differential-diagnoses-content');
+            const downloadDifferentialDiagnoses = document.getElementById('download-differential-diagnoses');
+            const downloadDifferentialDiagnosesModal = document.getElementById('download-differential-diagnoses-modal');
+            const viewHistoryBtn = document.getElementById('view-history');
+            const historyModal = new bootstrap.Modal(document.getElementById('history-modal'));
+            const historyTableBody = document.getElementById('history-table-body');
+            const noHistoryAlert = document.getElementById('no-history');
+            
+            // Initialize Bootstrap modals
+            const detailedOutputModal = new bootstrap.Modal(document.getElementById('detailed-output-modal'));
+            const discussionModal = new bootstrap.Modal(document.getElementById('discussion-modal'));
+            const differentialDiagnosesModal = new bootstrap.Modal(document.getElementById('differential-diagnoses-modal'));
+            const detailedOutputContent = document.getElementById('detailed-output-content');
+            const discussionContent = document.getElementById('discussion-content');
+            
+            // Add this to the beginning of the script section
+            const analyzeButton = document.getElementById('analyze-button');
+            
+            // Initialize markdown-it at the beginning of the script
+            const md = window.markdownit({
+                html: false,
+                linkify: true,
+                typographer: true
+            });
+            
+            // Function to handle the typing animation
+            function typeText(element, text, speed, callback) {
+                // Clear the element first
+                element.innerHTML = '';
+                
+                // Create a container for the rendered markdown
+                const markdownContainer = document.createElement('div');
+                markdownContainer.className = 'markdown-body';
+                element.appendChild(markdownContainer);
+                
+                let i = 0;
+                const interval = setInterval(function() {
+                    if (i < text.length) {
+                        // Add the next character
+                        i++;
+                        // Render the markdown as we go
+                        markdownContainer.innerHTML = md.render(text.substring(0, i));
+                        
+                        // Scroll to the bottom
+                        element.scrollTop = element.scrollHeight;
+                    } else {
+                        clearInterval(interval);
+                        if (callback) callback();
+                    }
+                }, speed);
+            }
+            
+            // Function to display content without typing animation
+            function displayTextInstantly(element, text) {
+                // Clear the element first
+                element.innerHTML = '';
+                
+                // Create a container for the rendered markdown
+                const markdownContainer = document.createElement('div');
+                markdownContainer.className = 'markdown-body';
+                element.appendChild(markdownContainer);
+                
+                // Render the markdown
+                markdownContainer.innerHTML = md.render(text);
+                
+                // Scroll to the top
+                element.scrollTop = 0;
+            }
+            
+            // Function to extract ESI level from text
+            function extractEsiLevel(text) {
+                const esiMatch = text.match(/ESI LEVEL: (\d)/i);
+                return esiMatch ? esiMatch[1] : null;
+            }
+            
+            // Handle form submission
+            triageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get the conversation text
+                const conversationText = document.getElementById('conversation-text').value;
+                
+                if (!conversationText.trim()) {
+                    alert('Please enter a patient conversation.');
+                    return;
+                }
+                
+                // Show loading indicator
+                loadingIndicator.style.display = 'none';
+                progressContainer.style.display = 'block';
+                
+                // Disable the analyze button
+                analyzeButton.disabled = true;
+                analyzeButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+                
+                // Hide results
+                resultsContainer.style.display = 'none';
+                
+                // Create a FormData object
+                const formData = new FormData(triageForm);
+                
+                // Send the form data to the server
+                fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Start checking status
+                        startStatusCheck();
+                    } else {
+                        alert('Error: ' + data.message);
+                        
+                        // Reset button
+                        analyzeButton.disabled = false;
+                        analyzeButton.innerHTML = '<i class="fas fa-stethoscope me-2"></i>Analyze Case';
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                    
+                    // Reset button
+                    analyzeButton.disabled = false;
+                    analyzeButton.innerHTML = '<i class="fas fa-stethoscope me-2"></i>Analyze Case';
+                });
+            });
+            
+            // Function to check the processing status
+            function checkStatus() {
+                fetch('/check_status')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'complete') {
+                            // Hide loading indicator
+                            loadingIndicator.style.display = 'none';
+                            progressContainer.style.display = 'none';
+                            
+                            // Display results
+                            resultsContainer.style.display = 'block';
+                            
+                            // Extract ESI level and display with appropriate styling
+                            const esiLevel = extractEsiLevel(data.quick_ref);
+                            if (esiLevel) {
+                                esiLevelDisplay.innerHTML = `<span class="esi-badge esi-${esiLevel}">ESI Level ${esiLevel}</span>`;
+                            }
+                            
+                            // Use typing effect for the content
+                            typeText(quickRefContent, data.quick_ref, 5, null);
+                            
+                            // Set download links
+                            downloadQuickRef.href = '/download/quick_ref';
+                            downloadDetailedOutput.href = '/download/detailed_output';
+                            downloadDiscussion.href = '/download/discussion';
+                            downloadDifferentialDiagnoses.href = '/download/differential_diagnoses';
+                            
+                            // Enable/disable buttons based on available files
+                            viewDetailedOutputBtn.disabled = !data.has_detailed_output;
+                            viewDiscussionBtn.disabled = !data.has_discussion;
+                            viewDifferentialDiagnosesBtn.disabled = !data.has_differential_diagnoses;
+                            
+                            // Show/hide download links based on available files
+                            downloadDifferentialDiagnoses.style.display = data.has_differential_diagnoses ? 'inline-block' : 'none';
+                            
+                            // Reset analyze button
+                            analyzeButton.disabled = false;
+                            analyzeButton.innerHTML = '<i class="fas fa-stethoscope me-2"></i>Analyze Case';
+                        } else if (data.status === 'error') {
+                            loadingIndicator.style.display = 'none';
+                            progressContainer.style.display = 'none';
+                            alert('Error: ' + data.message);
+                            
+                            // Reset analyze button
+                            analyzeButton.disabled = false;
+                            analyzeButton.innerHTML = '<i class="fas fa-stethoscope me-2"></i>Analyze Case';
+                        } else {
+                            // Still processing, check again in a second
+                            setTimeout(checkStatus, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        loadingIndicator.style.display = 'none';
+                        progressContainer.style.display = 'none';
+                        alert('Error: ' + error.message);
+                        
+                        // Reset analyze button
+                        analyzeButton.disabled = false;
+                        analyzeButton.innerHTML = '<i class="fas fa-stethoscope me-2"></i>Analyze Case';
+                    });
+            }
+            
+            // Function to start periodic status checking
+            function startStatusCheck() {
+                // Start checking immediately
+                checkStatus();
+                
+                // Set up event source for progress updates
+                const eventSource = new EventSource('/progress');
+                
+                eventSource.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    
+                    // Update progress UI
+                    progressTask.textContent = data.task;
+                    progressBar.style.width = data.percentage + '%';
+                    progressMessage.textContent = data.message;
+                    
+                    // If we're done or there's an error, close the event source
+                    if (data.status === 'complete' || data.status === 'error') {
+                        eventSource.close();
+                    }
+                };
+                
+                eventSource.onerror = function() {
+                    eventSource.close();
+                };
+            }
+            
+            // View detailed output
+            viewDetailedOutputBtn.addEventListener('click', function() {
+                fetch('/view_detailed_output')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+                        
+                        // Show modal first
+                        detailedOutputModal.show();
+                        
+                        // Then start typing effect
+                        setTimeout(() => {
+                            typeText(detailedOutputContent, data.content, 2, null);
+                        }, 300);
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error.message);
+                    });
+            });
+            
+            // View discussion
+            viewDiscussionBtn.addEventListener('click', function() {
+                fetch('/view_discussion')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+                        
+                        // Show modal first
+                        discussionModal.show();
+                        
+                        // Display content instantly without typing animation
+                        setTimeout(() => {
+                            displayTextInstantly(discussionContent, data.content);
+                        }, 300);
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error.message);
+                    });
+            });
+            
+            // Add event listener for the differential diagnoses button
+            viewDifferentialDiagnosesBtn.addEventListener('click', function() {
+                fetch('/view_differential_diagnoses')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+                        
+                        // Show modal first
+                        differentialDiagnosesModal.show();
+                        
+                        // Then start typing effect
+                        setTimeout(() => {
+                            typeText(differentialDiagnosesContent, data.content, 2, null);
+                        }, 300);
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error.message);
+                    });
+            });
+            
+            // Recording functionality
+            const startRecordingBtn = document.getElementById('start-recording');
+            const stopRecordingBtn = document.getElementById('stop-recording');
+            const recordingStatus = document.getElementById('recording-status');
+            const transcriptionStatus = document.getElementById('transcription-status');
+            const conversationText = document.getElementById('conversation-text');
+            
+            // Check recording status periodically
+            let recordingStatusInterval;
+            
+            startRecordingBtn.addEventListener('click', function() {
+                // Start recording
+                fetch('/recorder/start_recording', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Show recording UI
+                        startRecordingBtn.style.display = 'none';
+                        stopRecordingBtn.style.display = 'inline-block';
+                        recordingStatus.style.display = 'inline-block';
+                        
+                        // Start checking recording status
+                        recordingStatusInterval = setInterval(checkRecordingStatus, 1000);
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error starting recording: ' + error.message);
+                });
+            });
+            
+            stopRecordingBtn.addEventListener('click', function() {
+                // Stop recording
+                fetch('/recorder/stop_recording', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update UI
+                        stopRecordingBtn.style.display = 'none';
+                        recordingStatus.style.display = 'none';
+                        transcriptionStatus.style.display = 'block';
+                        
+                        // Clear interval
+                        clearInterval(recordingStatusInterval);
+                        
+                        // Transcribe the audio
+                        return fetch('/transcriber/transcribe', {
+                            method: 'POST'
+                        });
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide transcription status
+                    transcriptionStatus.style.display = 'none';
+                    
+                    // Show start recording button again
+                    startRecordingBtn.style.display = 'inline-block';
+                    
+                    if (data.status === 'success') {
+                        // Add transcription to conversation text - no join needed as it's a string now
+                        const transcription = data.transcription;
+                        
+                        // If there's already text, add a newline
+                        if (conversationText.value && conversationText.value.trim() !== '') {
+                            conversationText.value += '\n\n';
+                        }
+                        
+                        conversationText.value += transcription;
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    // Reset UI
+                    transcriptionStatus.style.display = 'none';
+                    startRecordingBtn.style.display = 'inline-block';
+                    alert('Error processing recording: ' + error.message);
+                });
+            });
+            
+            function checkRecordingStatus() {
+                fetch('/recorder/recording_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && !data.is_recording) {
+                        // Recording stopped unexpectedly
+                        clearInterval(recordingStatusInterval);
+                        stopRecordingBtn.style.display = 'none';
+                        recordingStatus.style.display = 'none';
+                        startRecordingBtn.style.display = 'inline-block';
+                        alert('Recording stopped unexpectedly');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking recording status:', error);
+                });
+            }
+            
+            // Add some CSS for the recording indicator
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                    100% { opacity: 1; }
+                }
+                .recording-indicator {
+                    animation: pulse 1s infinite;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add event listener for the view history button
+            viewHistoryBtn.addEventListener('click', function() {
+                // Load conversation history
+                fetch('/get_conversations')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear the table
+                        historyTableBody.innerHTML = '';
+                        
+                        if (data.conversations && data.conversations.length > 0) {
+                            // Hide the no history alert
+                            noHistoryAlert.style.display = 'none';
+                            
+                            // Add each conversation to the table
+                            data.conversations.forEach(conversation => {
+                                // Format the timestamp
+                                const timestamp = new Date(conversation.timestamp);
+                                const formattedDate = timestamp.toLocaleDateString();
+                                const formattedTime = timestamp.toLocaleTimeString();
+                                
+                                // Create a row for the conversation
+                                const row = document.createElement('tr');
+                                
+                                // Add ESI level with badge if available
+                                let esiCell = '';
+                                if (conversation.esi_level) {
+                                    esiCell = `<span class="esi-badge esi-${conversation.esi_level}">ESI ${conversation.esi_level}</span>`;
+                                } else {
+                                    esiCell = 'N/A';
+                                }
+                                
+                                // Add the cells to the row
+                                row.innerHTML = `
+                                    <td>${formattedDate}<br>${formattedTime}</td>
+                                    <td>${esiCell}</td>
+                                    <td>${conversation.summary || 'No summary available'}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary load-conversation" data-id="${conversation.id}">
+                                            <i class="fas fa-file-import me-1"></i>Load
+                                        </button>
+                                        <button class="btn btn-sm btn-danger delete-conversation" data-id="${conversation.id}">
+                                            <i class="fas fa-trash-alt me-1"></i>Delete
+                                        </button>
+                                    </td>
+                                `;
+                                
+                                // Add the row to the table
+                                historyTableBody.appendChild(row);
+                            });
+                            
+                            // Add event listeners to the load buttons
+                            document.querySelectorAll('#history-table-body .load-conversation').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const conversationId = this.getAttribute('data-id');
+                                    loadConversation(conversationId);
+                                });
+                            });
+                            
+                            // Add event listeners to the delete buttons
+                            document.querySelectorAll('#history-table-body .delete-conversation').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const conversationId = this.getAttribute('data-id');
+                                    if (confirm('Are you sure you want to delete this patient record?')) {
+                                        deleteConversation(conversationId);
+                                    }
+                                });
+                            });
+                        } else {
+                            // Show the no history alert
+                            noHistoryAlert.style.display = 'block';
+                        }
+                        
+                        // Show the modal
+                        historyModal.show();
+                    })
+                    .catch(error => {
+                        alert('Error loading conversation history: ' + error.message);
+                    });
+            });
+            
+            // Function to load a conversation
+            function loadConversation(conversationId) {
+                fetch(`/get_conversation/${conversationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.conversation) {
+                            // Load the conversation text into the textarea
+                            conversationText.value = data.conversation.conversation_text;
+                            
+                            // Close the modal
+                            historyModal.hide();
+                        } else {
+                            alert('Error: Conversation not found');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error loading conversation: ' + error.message);
+                    });
+            }
+            
+            // Function to delete a conversation
+            function deleteConversation(conversationId) {
+                fetch(`/delete_conversation/${conversationId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload the conversation history
+                        viewHistoryBtn.click();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting conversation: ' + error.message);
+                });
+            }
+
+            // Add these variables to the script
+            const prioritizePatientsBtn = document.getElementById('prioritize-patients');
+            const prioritizationModal = new bootstrap.Modal(document.getElementById('prioritization-modal'));
+            const priorityTableBody = document.getElementById('priority-table-body');
+            const noPatientsAlert = document.getElementById('no-patients');
+            const deleteAllRecordsBtn = document.getElementById('delete-all-records');
+
+            // Add event listener for delete buttons
+            document.querySelectorAll('.delete-conversation').forEach(button => {
+                button.addEventListener('click', function() {
+                    const conversationId = this.getAttribute('data-id');
+                    if (confirm('Are you sure you want to delete this patient record?')) {
+                        deleteConversation(conversationId);
+                    }
+                });
+            });
+
+            // Add event listener for delete all records button
+            deleteAllRecordsBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete ALL patient records? This cannot be undone.')) {
+                    deleteAllConversations();
+                }
+            });
+
+            // Add event listener for prioritize patients button
+            prioritizePatientsBtn.addEventListener('click', function() {
+                // Load prioritized patients
+                fetch('/get_prioritized_patients')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear the table
+                        priorityTableBody.innerHTML = '';
+                        
+                        if (data.patients && data.patients.length > 0) {
+                            // Hide the no patients alert
+                            noPatientsAlert.style.display = 'none';
+                            
+                            // Add each patient to the table
+                            data.patients.forEach((patient, index) => {
+                                // Format the timestamp
+                                const timestamp = new Date(patient.timestamp);
+                                const formattedTime = timestamp.toLocaleTimeString();
+                                
+                                // Create a row for the patient
+                                const row = document.createElement('tr');
+                                
+                                // Add ESI level with badge
+                                const esiCell = `<span class="esi-badge esi-${patient.esi_level}">ESI ${patient.esi_level}</span>`;
+                                
+                                // Extract patient identifier (use case_id or first part of summary)
+                                const patientId = patient.case_id || 
+                                    (patient.summary ? patient.summary.split(' ').slice(0, 3).join(' ') + '...' : 'Unknown');
+                                
+                                // Add the cells to the row
+                                row.innerHTML = `
+                                    <td><strong>#${index + 1}</strong></td>
+                                    <td>${patientId}</td>
+                                    <td>${esiCell}</td>
+                                    <td>${formattedTime}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary load-conversation" data-id="${patient.id}">
+                                            <i class="fas fa-file-import me-1"></i>Load
+                                        </button>
+                                    </td>
+                                `;
+                                
+                                // Add the row to the table
+                                priorityTableBody.appendChild(row);
+                            });
+                            
+                            // Add event listeners to the load buttons
+                            document.querySelectorAll('#priority-table-body .load-conversation').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const conversationId = this.getAttribute('data-id');
+                                    loadConversation(conversationId);
+                                    prioritizationModal.hide();
+                                });
+                            });
+                        } else {
+                            // Show the no patients alert
+                            noPatientsAlert.style.display = 'block';
+                        }
+                        
+                        // Show the modal
+                        prioritizationModal.show();
+                    })
+                    .catch(error => {
+                        alert('Error loading prioritized patients: ' + error.message);
+                    });
+            });
+
+            // Function to delete a conversation
+            function deleteConversation(conversationId) {
+                fetch(`/delete_conversation/${conversationId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload the conversation history
+                        viewHistoryBtn.click();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting conversation: ' + error.message);
+                });
+            }
+
+            // Function to delete all conversations
+            function deleteAllConversations() {
+                fetch('/delete_all_conversations', {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload the conversation history
+                        viewHistoryBtn.click();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting all conversations: ' + error.message);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
