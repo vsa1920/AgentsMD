@@ -21,8 +21,76 @@ Agents MD leverages the power of large language models in a collaborative framew
 - **Supportive** of existing medical workflows
 - **Responsive** to time-critical situations
 
+## Installation
 
+### Prerequisites
+- Python 3.12.7
+- pip 25.0
+- Anaconda or Miniconda
+- Git
 
-## Check out our Demo
+### Setup Steps
 
-See our demo folder for a web-based demonstration of the Agents MD triage system in action.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd AgentsMD
+   ```
+
+2. **Set up Conda environment**
+   ```bash
+   conda create -n agents-md python=3.12.7
+   conda activate agents-md
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Environment Setup**
+   - We provide a template `dotEnv` file with the required API keys structure
+   - Create your own `.env` file by copying the template:
+     ```bash
+     cp dotEnv .env
+     ```
+   - Get your API keys from:
+     - [OpenAI](https://platform.openai.com/api-keys) - For AI models and diagnosis generation
+     - [AssemblyAI](https://www.assemblyai.com/dashboard/signup) - For speech-to-text transcription
+   - Replace the placeholder values in `.env` with your actual API keys:
+     ```
+     OPENAI_API_KEY="your-openai-api-key"
+     ASSEMBLYAI_API_KEY="your-assemblyai-api-key"
+     ```
+
+## Running the Demo
+
+1. **Navigate to the demo directory**
+   ```bash
+   cd demo
+   ```
+
+2. **Start the application**
+   ```bash
+   python app.py
+   ```
+
+3. **Access the web interface**
+   - Open your web browser
+   - Go to `http://127.0.0.1:5000` (the default Flask development server)
+   
+## Features
+
+- Real-time speech-to-text transcription
+- AI-powered triage assessment
+- Differential diagnosis generation
+- Case discussion and detailed output viewing
+- Recording and transcription capabilities
+- Patient prioritization system
+
+## Important Notes
+
+- Ensure all required API keys are properly set in your `.env` file
+- The application creates directories for storing recordings, transcriptions, and other data
+- The system uses SQLite for storing conversation history
+- Make sure you have sufficient disk space for storing audio recordings and transcriptions
