@@ -94,3 +94,27 @@ Agents MD leverages the power of large language models in a collaborative framew
 - The application creates directories for storing recordings, transcriptions, and other data
 - The system uses SQLite for storing conversation history
 - Make sure you have sufficient disk space for storing audio recordings and transcriptions
+
+## Repository History
+
+This repository represents a significant evolution from its original foundations. Initially inspired by [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory), which provides an end-to-end autonomous research workflow using LLM agents, we saw an opportunity to adapt this multi-agent approach to address critical challenges in emergency medical care.
+
+The entire project was conceptualized and implemented in less than 24 hours during [Philly Codefest](https://drexel.edu/cci/partnerships/corporate/philly-codefest/), a hackathon hosted by Drexel University's College of Computing & Informatics. This intensive development sprint demonstrated the potential of adapting agentic AI systems to tackle critical real-world challenges, such as emergency room triage optimization.
+
+The journey of this codebase involved:
+1. Initial fork of AgentLaboratory by [Shailesh Shridhar](https://github.com/ShaileshSridhar2403), who began adapting the multi-agent framework for medical applications
+2. Collaborative work between Shailesh Shridhar and Vaibhav Sahu to transform the codebase for ER triage use cases during the hackathon
+3. Creation of this new repository due to substantial divergence from the original codebase, including:
+   - Complete refocus on medical diagnosis and triage
+   - Integration of medical-specific LLM agents
+   - Addition of speech-to-text capabilities for patient interactions
+   - Implementation of real-time diagnostic systems
+   - Development of a web-based interface for medical staff
+
+While we maintain the spirit of multi-agent collaboration from AgentLaboratory, this project has evolved into a specialized medical tool with its own unique architecture and purpose and hence, has been moved to a separate new repository. 
+
+## Acknowledgments
+
+This project is a new repository based on work originally done in collaboration with [Shailesh Shridhar](https://github.com/ShaileshSridhar2403) in the [AgentsMD repository](https://github.com/ShaileshSridhar2403/AgentsMD). The original repository was forked from [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory) by Samuel Schmidgall, which provided the initial foundation for this work.
+
+We express our gratitude to both repositories for their contributions to this project's development.

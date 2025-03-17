@@ -1,6 +1,9 @@
 MIT License
 
-Copyright (c) 2025 Samuel Schmidgall
+Copyright (c) 2024 Vaibhav Sahu
+Portions of this code are derived from:
+- AgentsMD by Shailesh Shridhar (https://github.com/ShaileshSridhar2403/AgentsMD)
+- AgentLaboratory by Samuel Schmidgall (https://github.com/SamuelSchmidgall/AgentLaboratory)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
