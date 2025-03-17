@@ -102,8 +102,8 @@ This repository represents a significant evolution from its original foundations
 The entire project was conceptualized and implemented in less than 24 hours during [Philly Codefest](https://drexel.edu/cci/partnerships/corporate/philly-codefest/), a hackathon hosted by Drexel University's College of Computing & Informatics. This intensive development sprint demonstrated the potential of adapting agentic AI systems to tackle critical real-world challenges, such as emergency room triage optimization.
 
 The journey of this codebase involved:
-1. Initial fork of AgentLaboratory by [Shailesh Shridhar](https://github.com/ShaileshSridhar2403), who began adapting the multi-agent framework for medical applications
-2. Collaborative work between Shailesh Shridhar and Vaibhav Sahu to transform the codebase for ER triage use cases during the hackathon
+1. Initial fork of [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory) into [AgentsMD](https://github.com/ShaileshSridhar2403/AgentsMD) for medical applications
+2. Collaborative development to transform the codebase for ER triage use cases during the hackathon
 3. Creation of this new repository due to substantial divergence from the original codebase, including:
    - Complete refocus on medical diagnosis and triage
    - Integration of medical-specific LLM agents
@@ -115,6 +115,4 @@ While we maintain the spirit of multi-agent collaboration from AgentLaboratory, 
 
 ## Acknowledgments
 
-This project is a new repository based on work originally done in collaboration with [Shailesh Shridhar](https://github.com/ShaileshSridhar2403) in the [AgentsMD repository](https://github.com/ShaileshSridhar2403/AgentsMD). The original repository was forked from [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory) by Samuel Schmidgall, which provided the initial foundation for this work.
-
-We express our gratitude to both repositories for their contributions to this project's development.
+This project was developed in collaboration with [Shailesh Shridhar](https://github.com/ShaileshSridhar2403) and builds upon work done in the [AgentsMD repository](https://github.com/ShaileshSridhar2403/AgentsMD), which was originally forked from [AgentLaboratory](https://github.com/SamuelSchmidgall/AgentLaboratory). We express our gratitude to both repositories for their contributions to this project's development.
